@@ -22,9 +22,11 @@ def scan_network(subnet):
                     'Port': port,
                     'Service': nm[host][proto][port]['name']
                 }
+                
                 scan_results_df = scan_results_df._append(row, ignore_index=True)
     
     return scan_results_df
+
 
 def get_current_subnet():
     gws = netifaces.gateways()
@@ -44,11 +46,12 @@ def get_current_subnet():
     return subnet
 
 def main():
-    subnet = get_current_subnet()
-    print(f"Detected subnet: {subnet}")
-    network = input("Enter IP/Subnet to scan: ")
+    scanned_subnet = get_current_subnet()
+    print(f"Detected subnet: {scanned_subnet}")
+    # network = input("Enter IP/Subnet to scan: ")
     print("Scanning... Please Wait...")
-    scan_results_df = scan_network(network)
+    scan_results_df = scan_network('10.17.7.15/32')
+    print(scan_results_df)
     
     excel_file_name = 'nmap_scan_results.xlsx'
     
