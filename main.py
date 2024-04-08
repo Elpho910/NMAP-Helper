@@ -1,5 +1,6 @@
 import nmap
 import pandas as pd
+import netifaces
 
 
 def scan_network(subnet):
@@ -24,8 +25,27 @@ def scan_network(subnet):
                 scan_results_df = scan_results_df._append(row, ignore_index=True)
     
     return scan_results_df
+
+def get_current_subnet():
+    gws = netifaces.gateways()
+    default_gateway = gws['default'][netifaces.AF_INET][0]
+    interface = gws['default'][netifaces.AF_INET][1]
     
+    addrs = netifaces.ifaddresses(interface)
+    ip_info = addrs[netifaces.AF_INET][0]
+    ip_address = ip_info['addr']
+    netmask = ip_info['netmask']
+    
+    ip_parts = ip_address.split('.')
+    mask_parts = netmask.split('.')
+    subnet_parts = [str(int(ip_parts[i]) & int(mask_parts[i])) for i in range(4)]
+    subnet = '.'.join(subnet_parts) + '/' + str(sum(bin(int(x)).count('1') for x in mask_parts ))
+    
+    return subnet
+
 def main():
+    subnet = get_current_subnet()
+    print(f"Detected subnet: {subnet}")
     network = input("Enter IP/Subnet to scan: ")
     print("Scanning... Please Wait...")
     scan_results_df = scan_network(network)
