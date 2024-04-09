@@ -1,11 +1,12 @@
 import nmap
 import pandas as pd
 import netifaces
+import PySimpleGUI as sg
 
 
 def scan_network(subnet):
     nm = nmap.PortScanner()
-    nm.scan(hosts=subnet, arguments='-sV')
+    nm.scan(hosts=subnet, arguments='-sS -F')
     
     columns = ['Host', 'Hostname', 'State', 'Protocol', 'Port', 'Service']
     scan_results_df = pd.DataFrame(columns=columns)
@@ -48,9 +49,8 @@ def get_current_subnet():
 def main():
     scanned_subnet = get_current_subnet()
     print(f"Detected subnet: {scanned_subnet}")
-    # network = input("Enter IP/Subnet to scan: ")
     print("Scanning... Please Wait...")
-    scan_results_df = scan_network('10.17.7.15/32')
+    scan_results_df = scan_network(scanned_subnet)
     print(scan_results_df)
     
     excel_file_name = 'nmap_scan_results.xlsx'
